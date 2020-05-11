@@ -584,7 +584,7 @@ func requestFields(req *http.Request) logrus.Fields {
 			fields[field] = v
 		}
 	}
-
+	fields["http.version"] = req.Proto
 	return logrus.Fields(fields)
 }
 
@@ -602,6 +602,6 @@ func responseFields(resp *http.Response) logrus.Fields {
 			fields[field] = v
 		}
 	}
-
+	fields["http.version"] = resp.Proto
 	return logrus.Fields(fields)
 }

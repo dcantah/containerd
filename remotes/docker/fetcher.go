@@ -63,9 +63,16 @@ func (r dockerFetcher) Fetch(ctx context.Context, desc ocispec.Descriptor) (io.R
 			}
 			log.G(ctx).Debug("trying alternative url")
 
+			client := http.DefaultClient
+			// Use registry hosts custom client instead.
+			if len(r.hosts) != 0 {
+				if r.hosts[0].Client != nil {
+					client = r.hosts[0].Client
+				}
+			}
 			// Try this first, parse it
 			host := RegistryHost{
-				Client:       http.DefaultClient,
+				Client:       client,
 				Host:         u.Host,
 				Scheme:       u.Scheme,
 				Path:         u.Path,
