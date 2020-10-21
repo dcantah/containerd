@@ -44,7 +44,6 @@ import (
 	"github.com/containerd/containerd/pkg/cri/util"
 	ctrdutil "github.com/containerd/containerd/pkg/cri/util"
 	"github.com/containerd/containerd/pkg/netns"
-	"github.com/containerd/containerd/snapshots"
 	selinux "github.com/opencontainers/selinux/go-selinux"
 )
 
@@ -192,10 +191,9 @@ func (c *criService) RunPodSandbox(ctx context.Context, r *runtime.RunPodSandbox
 		return nil, errors.Wrap(err, "failed to generate runtime options")
 	}
 
-	snapshotterOpt := snapshots.WithLabels(snapshots.FilterInheritedLabels(config.Annotations))
 	opts := []containerd.NewContainerOpts{
 		containerd.WithSnapshotter(c.config.ContainerdConfig.Snapshotter),
-		customopts.WithNewSnapshot(id, containerdImage, snapshotterOpt),
+		customopts.WithNewSnapshot(id, containerdImage, snapshotterOpts(config.Annotations)...),
 		containerd.WithSpec(spec, specOpts...),
 		containerd.WithContainerLabels(sandboxLabels),
 		containerd.WithContainerExtension(sandboxMetadataExtension, &sandbox.Metadata),

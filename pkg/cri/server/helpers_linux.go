@@ -32,6 +32,7 @@ import (
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/pkg/seccomp"
 	"github.com/containerd/containerd/pkg/seutil"
+	"github.com/containerd/containerd/snapshots"
 	runcapparmor "github.com/opencontainers/runc/libcontainer/apparmor"
 	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/opencontainers/selinux/go-selinux/label"
@@ -287,4 +288,10 @@ func getKVMLabel(l string) (string, error) {
 		return "", nil
 	}
 	return seutil.ChangeToKVM(l)
+}
+
+func snapshotterOpts(labels map[string]string) []snapshots.Opt {
+	return []snapshots.Opt{
+		snapshots.WithLabels(snapshots.FilterInheritedLabels(labels)),
+	}
 }

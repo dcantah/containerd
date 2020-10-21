@@ -22,6 +22,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/containerd/containerd/snapshots"
 	"github.com/opencontainers/runtime-spec/specs-go"
 )
 
@@ -40,4 +41,10 @@ func ensureRemoveAll(ctx context.Context, dir string) error {
 
 func modifyProcessLabel(runtimeType string, spec *specs.Spec) error {
 	return nil
+}
+
+func snapshotterOpts(labels map[string]string) []snapshots.Opt {
+	return []snapshots.Opt{
+		snapshots.WithLabels(snapshots.FilterInheritedLabels(labels)),
+	}
 }
