@@ -67,6 +67,10 @@ command. As part of this process, we do the following:
 			Name:  "max-concurrent-downloads",
 			Usage: "Set the max concurrent downloads for each pull",
 		},
+		cli.BoolFlag{
+			Name:  "discard-unpacked-layers",
+			Usage: "Specifies whether to allow GC to remove layers from the content store after successfully unpacking these layers to the snapshotter",
+		},
 	),
 	Action: func(context *cli.Context) error {
 		var (

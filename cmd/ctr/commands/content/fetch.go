@@ -45,7 +45,7 @@ var fetchCommand = cli.Command{
 	Usage:     "fetch all content for an image into containerd",
 	ArgsUsage: "[flags] <remote> <object>",
 	Description: `Fetch an image into containerd.
-	
+
 This command ensures that containerd has all the necessary resources to build
 an image's rootfs and convert the configuration to a runtime format supported
 by containerd.
@@ -148,6 +148,10 @@ func NewFetchConfig(ctx context.Context, clicontext *cli.Context) (*FetchConfig,
 	if clicontext.IsSet("max-concurrent-downloads") {
 		mcd := clicontext.Int("max-concurrent-downloads")
 		config.RemoteOpts = append(config.RemoteOpts, containerd.WithMaxConcurrentDownloads(mcd))
+	}
+
+	if clicontext.Bool("discard-unpacked-layers") {
+		config.RemoteOpts = append(config.RemoteOpts, containerd.WithChildLabelMap(images.ChildGCLabelsFilterLayers))
 	}
 
 	if clicontext.IsSet("max-concurrent-uploaded-layers") {
