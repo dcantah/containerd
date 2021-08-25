@@ -127,6 +127,7 @@ can be used and modified as necessary as a custom configuration.`
 			}
 		}
 
+		//
 		// Apply flags to the config
 		if err := applyFlags(context, config); err != nil {
 			return err
