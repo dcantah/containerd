@@ -1569,6 +1569,12 @@ func TestContainerLabels(t *testing.T) {
 }
 
 func TestContainerHook(t *testing.T) {
+	// OCI hooks aren't implemented on Windows. This test will actually run fine on Windows if there's a 'ps' binary in the users PATH, but 
+	// there's not any actual hook functionality being tested as any of the OCI fields are plain ignored for Windows containers. 
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
+
 	t.Parallel()
 
 	client, err := newClient(t, address)
