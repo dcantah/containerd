@@ -22,6 +22,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -222,7 +223,7 @@ func serve(ctx context.Context, server *ttrpc.Server, path string) error {
 	go func() {
 		defer l.Close()
 		if err := server.Serve(ctx, l); err != nil &&
-			!strings.Contains(err.Error(), "use of closed network connection") {
+			!errors.Is(err, net.ErrClosed) {
 			logrus.WithError(err).Fatal("containerd-shim: ttrpc server failure")
 		}
 	}()
