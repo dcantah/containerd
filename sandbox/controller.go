@@ -26,6 +26,8 @@ import (
 // When running in sandbox mode, shim expected to implement `SandboxService`.
 // Shim lifetimes are now managed manually via sandbox API by the containerd's client.
 type Controller interface {
+	// PID returns sandbox's process PID or error if its not yet started.
+	PID(ctx context.Context, sandboxID string) (*sandbox.ControllerPIDResponse, error)
 	// Create is used to initialize sandbox environment.
 	Create(ctx context.Context, sandboxID string) error
 	// Start will start previously created sandbox.

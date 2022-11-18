@@ -36,6 +36,14 @@ func NewSandboxController(client api.ControllerClient) sb.Controller {
 	return &remoteSandboxController{client: client}
 }
 
+func (s *remoteSandboxController) PID(ctx context.Context, sandboxID string) (*api.ControllerPIDResponse, error) {
+	resp, err := s.client.PID(ctx, &api.ControllerPIDRequest{SandboxID: sandboxID})
+	if err != nil {
+		return nil, errdefs.FromGRPC(err)
+	}
+	return resp, nil
+}
+
 func (s *remoteSandboxController) Create(ctx context.Context, sandboxID string) error {
 	_, err := s.client.Create(ctx, &api.ControllerCreateRequest{SandboxID: sandboxID})
 	if err != nil {

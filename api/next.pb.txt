@@ -3357,6 +3357,7 @@ file {
     java_outer_classname: "StatusProto"
     java_multiple_files: true
     go_package: "google.golang.org/genproto/googleapis/rpc/status;status"
+    cc_enable_arenas: true
     objc_class_prefix: "RPC"
   }
   syntax: "proto3"
@@ -4162,6 +4163,26 @@ file {
     }
   }
   message_type {
+    name: "ControllerPIDRequest"
+    field {
+      name: "sandbox_id"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_STRING
+      json_name: "sandboxId"
+    }
+  }
+  message_type {
+    name: "ControllerPIDResponse"
+    field {
+      name: "pid"
+      number: 1
+      label: LABEL_OPTIONAL
+      type: TYPE_UINT32
+      json_name: "pid"
+    }
+  }
+  message_type {
     name: "ControllerCreateRequest"
     field {
       name: "sandbox_id"
@@ -4408,6 +4429,11 @@ file {
   }
   service {
     name: "Controller"
+    method {
+      name: "PID"
+      input_type: ".containerd.services.sandbox.v1.ControllerPIDRequest"
+      output_type: ".containerd.services.sandbox.v1.ControllerPIDResponse"
+    }
     method {
       name: "Create"
       input_type: ".containerd.services.sandbox.v1.ControllerCreateRequest"

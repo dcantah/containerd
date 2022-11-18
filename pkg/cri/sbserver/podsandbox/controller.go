@@ -58,8 +58,7 @@ type Controller struct {
 	cri CRIService
 	// baseOCISpecs contains cached OCI specs loaded via `Runtime.BaseRuntimeSpec`
 	baseOCISpecs map[string]*oci.Spec
-
-	store *Store
+	store        *Store
 }
 
 func New(

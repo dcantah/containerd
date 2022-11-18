@@ -57,11 +57,17 @@ func (c *criService) CreateContainer(ctx context.Context, r *runtime.CreateConta
 		return nil, fmt.Errorf("failed to find sandbox id %q: %w", r.GetPodSandboxId(), err)
 	}
 	sandboxID := sandbox.ID
-	s, err := sandbox.Container.Task(ctx, nil)
+
+	// Use sandbox controller to grab pid
+	controller, err := c.getSandboxController(sandbox.Config, sandbox.RuntimeHandler)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get sandbox container task: %w", err)
+		return nil, fmt.Errorf("failed to get sandbox controller: %w", err)
 	}
-	sandboxPid := s.Pid()
+	resp, err := controller.PID(ctx, sandboxID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get sandbox PID: %w", err)
+	}
+	sandboxPid := resp.Pid
 
 	// Generate unique id and name for the container and reserve the name.
 	// Reserve the container name to avoid concurrent `CreateContainer` request creating

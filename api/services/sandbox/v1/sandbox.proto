@@ -85,12 +85,21 @@ message StoreGetResponse {
 
 // Controller is an interface to manage runtime sandbox instances.
 service Controller {
+	rpc PID(ControllerPIDRequest) returns (ControllerPIDResponse);
 	rpc Create(ControllerCreateRequest) returns (ControllerCreateResponse);
 	rpc Start(ControllerStartRequest) returns (ControllerStartResponse);
 	rpc Stop(ControllerStopRequest) returns (ControllerStopResponse);
 	rpc Wait(ControllerWaitRequest) returns (ControllerWaitResponse);
 	rpc Status(ControllerStatusRequest) returns (ControllerStatusResponse);
 	rpc Delete(ControllerDeleteRequest) returns (ControllerDeleteResponse);
+}
+
+message ControllerPIDRequest {
+	string sandbox_id = 1;
+}
+
+message ControllerPIDResponse {
+	uint32 pid = 1;
 }
 
 message ControllerCreateRequest {

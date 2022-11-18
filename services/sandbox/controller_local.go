@@ -83,6 +83,20 @@ type controllerLocal struct {
 
 var _ api.ControllerClient = (*controllerLocal)(nil)
 
+func (c *controllerLocal) PID(ctx context.Context, in *api.ControllerPIDRequest, opts ...grpc.CallOption) (*api.ControllerPIDResponse, error) {
+	svc, err := c.getSandbox(ctx, in.SandboxID)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err := svc.SandboxStatus(ctx, &runtimeAPI.SandboxStatusRequest{SandboxID: in.SandboxID})
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.ControllerPIDResponse{Pid: s.Pid}, nil
+}
+
 func (c *controllerLocal) Create(ctx context.Context, in *api.ControllerCreateRequest, opts ...grpc.CallOption) (*api.ControllerCreateResponse, error) {
 	if _, err := c.shims.Get(ctx, in.SandboxID); err == nil {
 		return nil, fmt.Errorf("sandbox %s already running: %w", in.SandboxID, errdefs.ErrAlreadyExists)

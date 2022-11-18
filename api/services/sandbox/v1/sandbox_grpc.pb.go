@@ -252,6 +252,7 @@ var Store_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ControllerClient interface {
+	PID(ctx context.Context, in *ControllerPIDRequest, opts ...grpc.CallOption) (*ControllerPIDResponse, error)
 	Create(ctx context.Context, in *ControllerCreateRequest, opts ...grpc.CallOption) (*ControllerCreateResponse, error)
 	Start(ctx context.Context, in *ControllerStartRequest, opts ...grpc.CallOption) (*ControllerStartResponse, error)
 	Stop(ctx context.Context, in *ControllerStopRequest, opts ...grpc.CallOption) (*ControllerStopResponse, error)
@@ -266,6 +267,15 @@ type controllerClient struct {
 
 func NewControllerClient(cc grpc.ClientConnInterface) ControllerClient {
 	return &controllerClient{cc}
+}
+
+func (c *controllerClient) PID(ctx context.Context, in *ControllerPIDRequest, opts ...grpc.CallOption) (*ControllerPIDResponse, error) {
+	out := new(ControllerPIDResponse)
+	err := c.cc.Invoke(ctx, "/containerd.services.sandbox.v1.Controller/PID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *controllerClient) Create(ctx context.Context, in *ControllerCreateRequest, opts ...grpc.CallOption) (*ControllerCreateResponse, error) {
@@ -326,6 +336,7 @@ func (c *controllerClient) Delete(ctx context.Context, in *ControllerDeleteReque
 // All implementations must embed UnimplementedControllerServer
 // for forward compatibility
 type ControllerServer interface {
+	PID(context.Context, *ControllerPIDRequest) (*ControllerPIDResponse, error)
 	Create(context.Context, *ControllerCreateRequest) (*ControllerCreateResponse, error)
 	Start(context.Context, *ControllerStartRequest) (*ControllerStartResponse, error)
 	Stop(context.Context, *ControllerStopRequest) (*ControllerStopResponse, error)
@@ -339,6 +350,9 @@ type ControllerServer interface {
 type UnimplementedControllerServer struct {
 }
 
+func (UnimplementedControllerServer) PID(context.Context, *ControllerPIDRequest) (*ControllerPIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PID not implemented")
+}
 func (UnimplementedControllerServer) Create(context.Context, *ControllerCreateRequest) (*ControllerCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
@@ -368,6 +382,24 @@ type UnsafeControllerServer interface {
 
 func RegisterControllerServer(s grpc.ServiceRegistrar, srv ControllerServer) {
 	s.RegisterService(&Controller_ServiceDesc, srv)
+}
+
+func _Controller_PID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ControllerPIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ControllerServer).PID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/containerd.services.sandbox.v1.Controller/PID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ControllerServer).PID(ctx, req.(*ControllerPIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Controller_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -485,6 +517,10 @@ var Controller_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "containerd.services.sandbox.v1.Controller",
 	HandlerType: (*ControllerServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PID",
+			Handler:    _Controller_PID_Handler,
+		},
 		{
 			MethodName: "Create",
 			Handler:    _Controller_Create_Handler,

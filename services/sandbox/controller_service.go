@@ -69,6 +69,11 @@ func (s *controllerService) Register(server *grpc.Server) error {
 	return nil
 }
 
+func (s *controllerService) PID(ctx context.Context, req *api.ControllerPIDRequest) (*api.ControllerPIDResponse, error) {
+	log.G(ctx).WithField("req", req).Debug("sandbox pid")
+	return s.local.PID(ctx, req)
+}
+
 func (s *controllerService) Create(ctx context.Context, req *api.ControllerCreateRequest) (*api.ControllerCreateResponse, error) {
 	log.G(ctx).WithField("req", req).Debug("create sandbox")
 	return s.local.Create(ctx, req)
