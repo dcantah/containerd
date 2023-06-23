@@ -53,11 +53,6 @@ import (
 )
 
 func empty() cio.Creator {
-	// TODO (@mlaventure) windows searches for pipes
-	// when none are provided
-	if runtime.GOOS == "windows" {
-		return cio.NewCreator(cio.WithStdio, cio.WithTerminal)
-	}
 	return cio.NullIO
 }
 
@@ -577,28 +572,23 @@ func TestContainerPids(t *testing.T) {
 		t.Errorf("invalid task pid %d", taskPid)
 	}
 	processes, err := task.Pids(ctx)
-	switch runtime.GOOS {
-	case "windows":
-		// TODO: This is currently not implemented on windows
-	default:
-		if err != nil {
-			t.Fatal(err)
-		}
-		// 2 processes, 1 for sh and one for sleep
-		if l := len(processes); l != 2 {
-			t.Errorf("expected 2 process but received %d", l)
-		}
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 2 processes, 1 for sh and one for sleep
+	if l := len(processes); l != 2 {
+		t.Errorf("expected 2 process but received %d", l)
+	}
 
-		var found bool
-		for _, p := range processes {
-			if p.Pid == taskPid {
-				found = true
-				break
-			}
+	var found bool
+	for _, p := range processes {
+		if p.Pid == taskPid {
+			found = true
+			break
 		}
-		if !found {
-			t.Errorf("pid %d must be in %+v", taskPid, processes)
-		}
+	}
+	if !found {
+		t.Errorf("pid %d must be in %+v", taskPid, processes)
 	}
 	if err := task.Kill(ctx, syscall.SIGKILL); err != nil {
 		select {
